@@ -1,0 +1,61 @@
+{
+  "log": {
+    "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "port": 1080,
+      "protocol": "socks",
+      "settings": {
+        "udp": true
+      }
+    },
+    {
+      "port": 8080,
+      "protocol": "http",
+      "settings": {}
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "your-domain.com",
+            "port": 443,
+            "users": [
+              {
+                "id": "6c2b79ca-c071-4c30-9fd7-3819ca96bc9c",
+                "encryption": "none",
+                "email": "PC"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "tls",
+        "tlsSettings": {
+          "serverName": "your-domain.com",
+          "allowInsecure": false,
+          "minVersion": "1.2",
+          "maxVersion": "1.2"
+        },
+        "xhttpSettings": {
+          "path": "/80ae00e4-3236-4774-b766",
+          "headers": {
+            "Host": "your-domain.com"
+          },
+          "mode": "auto",
+          "noSSEHeader": false,
+          "scMaxBufferedPosts": 30,
+          "scMaxEachPostBytes": "1000000",
+          "scStreamUpServerSecs": "20-80",
+          "xPaddingBytes": "100-1000"
+        }
+      }
+    }
+  ]
+}

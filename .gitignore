@@ -1,0 +1,32 @@
+# Backup files
+*.backup
+*.bak
+backup-*
+
+# Log files
+*.log
+logs/
+
+# SSL certificates
+*.crt
+*.key
+*.pem
+ssl/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+*.orig
+*~
