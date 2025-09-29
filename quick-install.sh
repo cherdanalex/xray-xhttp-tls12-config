@@ -22,7 +22,7 @@ cd "$TMP_DIR"
 
 echo "[1/4] Downloading installation files from latest commit..."
 # Use specific commit to bypass GitHub cache
-curl -sL https://github.com/cherdanalex/xray-xhttp-tls12-config/archive/23b8678.tar.gz | tar xz
+curl -sL https://github.com/cherdanalex/xray-xhttp-tls12-config/archive/f93118e.tar.gz | tar xz
 
 # Find the extracted directory (GitHub may use different naming)
 EXTRACTED_DIR=$(find . -maxdepth 1 -type d -name "xray-xhttp-tls12-config-*" | head -1)
