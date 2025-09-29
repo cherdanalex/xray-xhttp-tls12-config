@@ -221,22 +221,68 @@ log "INFO" "Firewall setup completed"
 if [[ "$SSH_PORT" != "22" ]]; then
     log "WARN" "SSH port is $SSH_PORT (not 22)"
 fi
+
 # Setup Nginx
 # Export variables for envsubst
 export DOMAIN XRAY_PORT XRAY_UUID REALITY_PRIVATE_KEY REALITY_PUBLIC_KEY REALITY_SHORT_ID
-log "INFO" "Configuring Nginx..."
-envsubst '${DOMAIN} ${XRAY_PORT}' < configs/nginx-xray-proxy.conf.example > /etc/nginx/sites-available/xray-proxy
+log "INFO" "Configuring Nginx (initial HTTP-only setup)..."
+
+# Create initial HTTP-only configuration for Certbot
+cat > /etc/nginx/sites-available/xray-proxy << NGINXEOF
+server {
+    listen 80;
+    server_name ${DOMAIN};
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+    
+    location / {
+        return 200 'Server is being configured...';
+        add_header Content-Type text/plain;
+    }
+}
+NGINXEOF
+
 ln -sf /etc/nginx/sites-available/xray-proxy /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 
-nginx -t
+# Test and start Nginx
+if nginx -t; then
+    log "INFO" "Nginx configuration is valid"
+else
+    log "ERROR" "Nginx configuration test failed!"
+    exit 1
+fi
+
 systemctl start nginx
 systemctl enable nginx
 
 # Get SSL certificate
-log "INFO" "Obtaining SSL certificate..."
-certbot --nginx -d "$DOMAIN" --email "$EMAIL" --agree-tos --non-interactive --redirect
+log "INFO" "Obtaining SSL certificate from Let's Encrypt..."
+if certbot --nginx -d "$DOMAIN" --email "$EMAIL" --agree-tos --non-interactive --redirect; then
+    log "INFO" "SSL certificate obtained successfully!"
+else
+    log "ERROR" "Failed to obtain SSL certificate"
+    log "INFO" "Please check:"
+    log "INFO" "1. Domain $DOMAIN points to this server"
+    log "INFO" "2. Port 80 is accessible"
+    log "INFO" "3. No rate limit issues with Let's Encrypt"
+    exit 1
+fi
 
+# Now create full Xray proxy configuration with SSL
+log "INFO" "Creating Xray proxy configuration with SSL..."
+envsubst '${DOMAIN} ${XRAY_PORT}' < configs/nginx-xray-proxy.conf.example > /etc/nginx/sites-available/xray-proxy
+
+# Test and reload Nginx
+if nginx -t; then
+    systemctl reload nginx
+    log "INFO" "Nginx reloaded with Xray proxy configuration"
+else
+    log "ERROR" "Nginx configuration test failed after adding Xray proxy"
+    exit 1
+fi
 # Create Xray configuration
 log "INFO" "Creating Xray server configuration..."
 mkdir -p /etc/xray
