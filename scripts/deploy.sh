@@ -170,7 +170,7 @@ chmod +x scripts/firewall-setup.sh
 
 # Setup Nginx
 log "INFO" "Configuring Nginx..."
-envsubst < configs/nginx-xray-proxy.conf.example > /etc/nginx/sites-available/xray-proxy
+envsubst '${DOMAIN} ${XRAY_PORT}' < configs/nginx-xray-proxy.conf.example > /etc/nginx/sites-available/xray-proxy
 ln -sf /etc/nginx/sites-available/xray-proxy /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 
@@ -185,7 +185,7 @@ certbot --nginx -d "$DOMAIN" --email "$EMAIL" --agree-tos --non-interactive --re
 # Create Xray configuration
 log "INFO" "Creating Xray server configuration..."
 mkdir -p /etc/xray
-envsubst < configs/xray-server.json.example > /etc/xray/config.json
+envsubst '${XRAY_PORT} ${XRAY_UUID} ${DOMAIN} ${REALITY_PRIVATE_KEY} ${REALITY_SHORT_ID}' < configs/xray-server.json.example > /etc/xray/config.json
 
 mkdir -p /var/log/xray
 chown xray:xray /var/log/xray
@@ -201,7 +201,7 @@ chmod +x scripts/update-cert.sh
 
 # Create client configuration
 mkdir -p client-configs
-envsubst < configs/xray-client.json.example > client-configs/xray-client.json
+envsubst '${DOMAIN} ${XRAY_UUID} ${REALITY_PUBLIC_KEY} ${REALITY_SHORT_ID}' < configs/xray-client.json.example > client-configs/xray-client.json
 
 log "INFO" "Deployment completed successfully!"
 echo
