@@ -1,0 +1,55 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "port": 10808,
+      "protocol": "socks",
+      "settings": {
+        "udp": true
+      }
+    },
+    {
+      "port": 10809,
+      "protocol": "http"
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "${DOMAIN}",
+            "port": 443,
+            "users": [
+              {
+                "id": "${XRAY_UUID}",
+                "flow": "xtls-rprx-vision",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "fingerprint": "chrome",
+          "serverName": "${DOMAIN}",
+          "publicKey": "${REALITY_PUBLIC_KEY}",
+          "shortId": "${REALITY_SHORT_ID}",
+          "spiderX": "/"
+        },
+        "xhttpSettings": {
+          "mode": "stream-up",
+          "path": "/",
+          "keepAlivePeriod": 300
+        }
+      }
+    }
+  ]
+}
