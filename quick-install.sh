@@ -20,9 +20,10 @@ TMP_DIR="/tmp/xray-install-$(date +%s)"
 mkdir -p "$TMP_DIR"
 cd "$TMP_DIR"
 
-echo "[1/4] Downloading installation files..."
-curl -sL https://github.com/cherdanalex/xray-xhttp-tls12-config/archive/refs/heads/main.tar.gz | tar xz
-cd xray-xhttp-tls12-config-main
+echo "[1/4] Downloading installation files from latest commit..."
+# Use specific commit to bypass GitHub cache
+curl -sL https://github.com/cherdanalex/xray-xhttp-tls12-config/archive/23b8678.tar.gz | tar xz
+cd xray-xhttp-tls12-config-23b8678
 
 echo "[2/4] Setting permissions..."
 chmod +x scripts/*.sh
