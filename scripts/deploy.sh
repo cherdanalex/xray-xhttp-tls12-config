@@ -163,12 +163,67 @@ else
     log "INFO" "Xray is already installed"
 fi
 
-# Setup firewall
-log "INFO" "Setting up firewall..."
-chmod +x scripts/firewall-setup.sh
-./scripts/firewall-setup.sh
 
+# Setup firewall (inline)
+log "INFO" "Setting up firewall..."
+
+# Install UFW if not present
+if ! command -v ufw &> /dev/null; then
+    log "INFO" "Installing UFW..."
+    apt-get update -qq
+    apt-get install -y -qq ufw
+fi
+
+# Function to check if rule exists
+rule_exists() {
+    local port="$1"
+    local protocol="${2:-tcp}"
+    ufw status numbered 2>/dev/null | grep -q "${port}/${protocol}"
+}
+
+# Function to add rule if not exists
+add_rule_if_not_exists() {
+    local port="$1"
+    local protocol="${2:-tcp}"
+    local description="$3"
+    
+    if rule_exists "$port" "$protocol"; then
+        log "INFO" "Rule for $port/$protocol already exists"
+        return 0
+    else
+        log "INFO" "Adding rule: $description"
+        ufw allow "$port/$protocol" comment "$description" 2>/dev/null || true
+        return 1
+    fi
+}
+
+# Check if UFW is already active
+if ufw status 2>/dev/null | grep -q "Status: active"; then
+    log "INFO" "UFW is active, checking rules..."
+    add_rule_if_not_exists "$SSH_PORT" "tcp" "SSH"
+    add_rule_if_not_exists "80" "tcp" "HTTP"
+    add_rule_if_not_exists "443" "tcp" "HTTPS"
+    add_rule_if_not_exists "$XRAY_PORT" "tcp" "Xray"
+else
+    log "INFO" "Setting up UFW..."
+    ufw --force reset 2>/dev/null || true
+    ufw default deny incoming
+    ufw default allow outgoing
+    ufw logging on
+    ufw allow "$SSH_PORT/tcp" comment "SSH"
+    ufw allow "80/tcp" comment "HTTP"
+    ufw allow "443/tcp" comment "HTTPS"
+    ufw allow "$XRAY_PORT/tcp" comment "Xray"
+    ufw --force enable
+fi
+
+log "INFO" "Firewall setup completed"
+if [[ "$SSH_PORT" != "22" ]]; then
+    log "WARN" "SSH port is $SSH_PORT (not 22)"
+fi
 # Setup Nginx
+# Export variables for envsubst
+export DOMAIN XRAY_PORT XRAY_UUID REALITY_PRIVATE_KEY REALITY_PUBLIC_KEY REALITY_SHORT_ID
 log "INFO" "Configuring Nginx..."
 envsubst '${DOMAIN} ${XRAY_PORT}' < configs/nginx-xray-proxy.conf.example > /etc/nginx/sites-available/xray-proxy
 ln -sf /etc/nginx/sites-available/xray-proxy /etc/nginx/sites-enabled/
