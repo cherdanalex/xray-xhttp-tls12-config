@@ -121,6 +121,9 @@ if [[ "$RECONFIGURE" == "true" ]]; then
         echo -n "Enter your domain name (e.g., example.com): "
         read DOMAIN
         if [[ -n "$DOMAIN" && "$DOMAIN" != "" ]]; then
+        # Clean domain from invisible characters and whitespace
+        DOMAIN=$(echo "$DOMAIN" | tr -d '\r\n\t' | xargs)
+        log "INFO" "Domain set to: $DOMAIN"
             break
         else
             log "ERROR" "Domain cannot be empty. Please try again."
