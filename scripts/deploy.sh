@@ -30,6 +30,29 @@ fi
 mkdir -p /var/log/xray
 touch /var/log/xray-deploy.log
 chmod 644 /var/log/xray-deploy.log
+# Clean up old configurations
+# Stop Nginx if running
+systemctl stop nginx 2>/dev/null || true
+
+log "INFO" "Cleaning up old configurations..."
+
+# Remove old Nginx configurations that might conflict
+if [ -f "/etc/nginx/sites-enabled/xray-xhttp-proxy" ]; then
+    rm -f /etc/nginx/sites-enabled/xray-xhttp-proxy
+    log "INFO" "Removed old xray-xhttp-proxy configuration"
+fi
+
+if [ -f "/etc/nginx/sites-available/xray-xhttp-proxy" ]; then
+    rm -f /etc/nginx/sites-available/xray-xhttp-proxy
+    log "INFO" "Removed old xray-xhttp-proxy from sites-available"
+fi
+
+# Remove symlinks to xray-proxy if they exist
+if [ -L "/etc/nginx/sites-enabled/xray-proxy" ]; then
+    rm -f /etc/nginx/sites-enabled/xray-proxy
+    log "INFO" "Removed old xray-proxy symlink"
+fi
+
 
 log "INFO" "Starting Xray server deployment..."
 
