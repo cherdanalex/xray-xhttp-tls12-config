@@ -50,7 +50,7 @@ xray-xhttp-tls12-config/
 ### Установка одной командой
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/cherdanalex/xray-xhttp-tls12-config/main/scripts/deploy.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/cherdanalex/xray-xhttp-tls12-config/main/install-direct.sh -o /tmp/install.sh && sudo bash /tmp/install.sh
 ```
 
 Скрипт автоматически:

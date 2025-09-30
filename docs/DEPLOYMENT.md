@@ -7,7 +7,7 @@
 ### Быстрый запуск - одна команда
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/cherdanalex/xray-xhttp-tls12-config/main/scripts/deploy.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/cherdanalex/xray-xhttp-tls12-config/main/install-direct.sh -o /tmp/install.sh && sudo bash /tmp/install.sh
 ```
 
 **Внутри уже всё спросит и настроит!**
