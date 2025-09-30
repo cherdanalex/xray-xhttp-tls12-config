@@ -50,6 +50,20 @@ fi
 # Remove symlinks to xray-proxy if they exist
 if [ -L "/etc/nginx/sites-enabled/xray-proxy" ]; then
     rm -f /etc/nginx/sites-enabled/xray-proxy
+
+# Clean up nginx.conf if it has broken includes
+if [ -f "/etc/nginx/nginx.conf" ]; then
+    # Remove any broken include lines for xray configs
+    sed -i '/xray-xhttp-proxy/d' /etc/nginx/nginx.conf
+    sed -i '/xray-proxy/d' /etc/nginx/nginx.conf
+    log "INFO" "Cleaned up nginx.conf includes"
+fi
+
+# Also remove any broken site configs
+rm -f /etc/nginx/sites-enabled/xray-* 2>/dev/null || true
+rm -f /etc/nginx/sites-available/xray-* 2>/dev/null || true
+log "INFO" "Removed all old xray configurations"
+
     log "INFO" "Removed old xray-proxy symlink"
 fi
 
