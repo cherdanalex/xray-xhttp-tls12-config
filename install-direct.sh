@@ -21,7 +21,7 @@ mkdir -p "$TMP_DIR"
 cd "$TMP_DIR"
 
 echo "[1/4] Downloading installation files..."
-curl -sL https://github.com/cherdanalex/xray-xhttp-tls12-config/archive/41e358e.tar.gz -o xray.tar.gz
+curl -sL https://github.com/cherdanalex/xray-xhttp-tls12-config/archive/1b63b25.tar.gz -o xray.tar.gz
 
 echo "[2/4] Extracting files..."
 tar xzf xray.tar.gz
