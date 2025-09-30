@@ -325,11 +325,8 @@ else
 fi
 # Create Xray configuration
 log "INFO" "Creating Xray server configuration..."
-mkdir -p /etc/xray
 envsubst '${XRAY_PORT} ${XRAY_UUID} ${DOMAIN} ${REALITY_PRIVATE_KEY} ${REALITY_SHORT_ID}' < configs/xray-server.json.example > /etc/xray/config.json
-
-mkdir -p /var/log/xray
-chown xray:xray /var/log/xray
+chown xray:xray /etc/xray/config.json
 
 cp systemd/xray.service /etc/systemd/system/
 systemctl daemon-reload
