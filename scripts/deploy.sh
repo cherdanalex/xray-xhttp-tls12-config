@@ -203,6 +203,21 @@ else
     log "INFO" "Xray is already installed"
 fi
 
+# Ensure xray user exists
+if ! id -u xray &> /dev/null; then
+    log "INFO" "Creating xray system user..."
+    useradd -r -M -s /usr/sbin/nologin xray
+else
+    log "INFO" "User xray already exists"
+fi
+
+# Create directories with correct ownership
+log "INFO" "Setting up Xray directories..."
+mkdir -p /etc/xray
+mkdir -p /var/log/xray
+chown -R xray:xray /etc/xray /var/log/xray
+chmod 755 /etc/xray /var/log/xray
+
 
 # Setup firewall (inline)
 log "INFO" "Setting up firewall..."
